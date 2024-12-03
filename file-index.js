@@ -7,6 +7,7 @@ const API_URL = process.env.API_URL;
 const API_USERNAME = process.env.API_USERNAME;
 const API_PASSWORD = process.env.API_PASSWORD;
 let taskid = 0;
+let firstTime = true;
 let status = '';
 let differenceInMinutesStatus = false;
 
@@ -82,16 +83,24 @@ const checkApiStatus = async () => {
                     await saveData()
                     let categoryText = data.category.toString()
          
-                    if( categoryText !== 'Success' && categoryText !== 'Start'){
-                        categoryText = data.category.toString('utf-8') + emoji.toString('utf-8');
-                    
+                    if (firstTime === false) {
+                        if( categoryText !== 'Success' && categoryText !== 'Start' ){
+                            categoryText = data.category.toString('utf-8') + emoji.toString('utf-8');
+                        
+                        }
+                        
+                        await sendLineNotify(`Job ${data.taskid}, status : ${categoryText} ${data.message.toString()??''}, time : ${datetime}.`);
+
+
+                        if( differenceInMinutes >= 30){
+                            await sendLineNotify(`Job ${data.taskid}, status : Timeout:❗❗ เคสใช้เวลาเกิน 30 นาที, time : ${currentTimeFormat}.`);
+                        }
                     }
-                    
-                    await sendLineNotify(`Job ${data.taskid}, status : ${categoryText} ${data.message.toString()??''}, time : ${datetime}.`);
 
-
-                    if( differenceInMinutes >= 30){
-                        await sendLineNotify(`Job ${data.taskid}, status : Timeout:❗❗ เคสใช้เวลาเกิน 30 นาที, time : ${currentTimeFormat}.`);
+                    // เลือกเฉพาะ Start หลังจากเริ่มทำงานแล้ว
+                    if (categoryText === 'Start' && firstTime === true ) {
+                        await sendLineNotify(`Job ${data.taskid}, status : ${categoryText} ${data.message.toString()??''}, time : ${datetime}.`);
+                        firstTime = false;
                     }
                 }
                 console.log(taskid)
