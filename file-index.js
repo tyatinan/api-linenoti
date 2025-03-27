@@ -11,6 +11,9 @@ let firstTime = true;
 let status = '';
 let differenceInMinutesStatus = false;
 
+const TOKEN = "7321793801:AAFrhfrtHbRrKzwq2fglVNmF1SQueYbzYsY"; // ใส่ Token ของบอท
+const CHAT_ID = "-4626429192"; // ใส่ Chat ID ของผู้ใช้หรือกลุ่ม // AYA: -4626429192  ,  test : -4616186735
+
 const dataJson = {
     "taskid" : taskid
   };
@@ -131,6 +134,20 @@ const sendLineNotify = async (message) => {
         console.log('Notification sent successfully.');
     } catch (error) {
         console.error('Failed to send notification:', error.message);
+    }
+
+    try {
+        const response = await axios.post(
+            `https://api.telegram.org/bot${TOKEN}/sendMessage`,
+            {
+                chat_id: CHAT_ID,
+                text: message 
+            }
+        );
+    
+            console.log("✅ Message sent:", response.data);
+        } catch (error) {
+            console.error("❌ Error sending message:", error.response?.data || error.message);
     }
 };
 
